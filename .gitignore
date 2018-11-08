@@ -1,0 +1,10 @@
+/target
+/.idea
+*.iml
+/*.iml
+/out
+/springboot-auto-profile
+/*.exe
+app
+AnyVideoGo
+video.jar

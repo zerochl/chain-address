@@ -9,6 +9,7 @@ import (
 	"github.com/eoscanada/eos-go/btcsuite/btcutil"
 	"github.com/eoscanada/eos-go/btcsuite/btcd/btcec"
 	"flag"
+	"github.com/tyler-smith/go-bip39"
 )
 
 //2018/11/07 20:32:16 mnemonic: middle market permit snow slight blanket card armed magic hole mammal enter
@@ -19,6 +20,7 @@ import (
 func main()  {
 	cmd := flag.String("cmd", "", "create or ethtoeos or eostoeth")
 	private := flag.String("private", "", "私钥")
+	entropy := flag.String("entropy", "", "entropy")
 	flag.Parse()
 	switch *cmd {
 	case "create":
@@ -32,7 +34,16 @@ func main()  {
 		// 5Jwi16z6aoErWTL6jG7fASDLPaaib2AjT5NM9o4esVEuuCwJ9Eu
 		eosPrivateToETHPrivate(*private)
 		break
+	case "bitpie":
+		recoveryMnemonic(*entropy)
+		break
 	}
+}
+
+func recoveryMnemonic(entropy string)  {
+	entropyByte, _ :=  hex.DecodeString(entropy)
+	str, _ := bip39.NewMnemonic(entropyByte)
+	log.Println("mnemonic:", str)
 }
 
 func ethPrivate()  {

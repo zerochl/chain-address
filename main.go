@@ -10,6 +10,7 @@ import (
 	"github.com/eoscanada/eos-go/btcsuite/btcd/btcec"
 	"flag"
 	"github.com/tyler-smith/go-bip39"
+	"mykey/thirdparty/go-ethereum/common/hexutil"
 )
 
 //2018/11/07 20:32:16 mnemonic: middle market permit snow slight blanket card armed magic hole mammal enter
@@ -20,6 +21,7 @@ import (
 func main()  {
 	cmd := flag.String("cmd", "", "create or ethtoeos or eostoeth")
 	private := flag.String("private", "", "私钥")
+	public := flag.String("public", "", "私钥")
 	entropy := flag.String("entropy", "", "entropy")
 	flag.Parse()
 	switch *cmd {
@@ -30,7 +32,15 @@ func main()  {
 		// 948be7b7ac1ac60c7956184e81ae8a0082f884e6ec7f273e18e80eae0373602f
 		ethPrivateToEosPrivate(*private)
 		break
+	case "ethpubtoeos":
+		// 948be7b7ac1ac60c7956184e81ae8a0082f884e6ec7f273e18e80eae0373602f
+		ethPublicToEosPub(*public)
+		break
 	case "eostoeth":
+		// 5Jwi16z6aoErWTL6jG7fASDLPaaib2AjT5NM9o4esVEuuCwJ9Eu
+		eosPrivateToETHPrivate(*private)
+		break
+	case "eospubtoeth":
 		// 5Jwi16z6aoErWTL6jG7fASDLPaaib2AjT5NM9o4esVEuuCwJ9Eu
 		eosPrivateToETHPrivate(*private)
 		break
@@ -86,7 +96,34 @@ func ethPrivateToEosPrivate(ethPrivateHex string)  {
 	log.Println("EosAddress:", privatekey.PublicKey().String())
 }
 
+func ethPublicToEosPub(ethPubHex string) {
+	ethPubByte, err := hexutil.Decode(ethPubHex)
+	if err != nil {
+		log.Println("error in ethPublicToEosPrivate:", err.Error())
+		return
+	}
+	eosPub := &ecc.PublicKey{Curve:ecc.CurveK1, Content:ethPubByte}
+	log.Println("eos pub:", eosPub.String())
+}
+
 func eosPrivateToETHPrivate(eosPrivate string)  {
+	ethPrivateHex, err := convertToETHPriKey(eosPrivate)
+	if err != nil {
+		log.Println("in eosPrivateToETHPrivate convertToETHPriKey err:", err.Error())
+		return
+	}
+	ethPrivateByte, err := hex.DecodeString(ethPrivateHex)
+	if err != nil {
+		log.Println("in eosPrivateToETHPrivate DecodeString err:", err.Error())
+		return
+	}
+	privateKey, err := crypto.ToECDSA(ethPrivateByte)
+	address := crypto.PubkeyToAddress(privateKey.PublicKey)
+	log.Println("ETHPrivate:", ethPrivateHex)
+	log.Println("ETHAddress:", address.String())
+}
+
+func eosPublicToETHPrivate(eosPrivate string)  {
 	ethPrivateHex, err := convertToETHPriKey(eosPrivate)
 	if err != nil {
 		log.Println("in eosPrivateToETHPrivate convertToETHPriKey err:", err.Error())

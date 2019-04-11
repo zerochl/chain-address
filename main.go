@@ -11,6 +11,7 @@ import (
 	"flag"
 	"github.com/tyler-smith/go-bip39"
 	"mykey/thirdparty/go-ethereum/common/hexutil"
+	"convertAddress/bip39Helpher"
 )
 
 //2018/11/07 20:32:16 mnemonic: middle market permit snow slight blanket card armed magic hole mammal enter
@@ -23,6 +24,7 @@ func main()  {
 	private := flag.String("private", "", "私钥")
 	public := flag.String("public", "", "私钥")
 	entropy := flag.String("entropy", "", "entropy")
+	mnemonic := flag.String("mnemonic", "", "助记词")
 	flag.Parse()
 	switch *cmd {
 	case "create":
@@ -47,7 +49,23 @@ func main()  {
 	case "bitpie":
 		recoveryMnemonic(*entropy)
 		break
+	case "toEnglish":
+		toEnglishMnemonic(*mnemonic)
+		break
+	case "toChinese":
+
+		break
 	}
+}
+
+func toEnglishMnemonic(mnemonic string) {
+	englishMnemonic, err := bip39Helper.GetEnglishMnemonic(mnemonic)
+	if err != nil {
+		log.Println("GetEnglishMnemonic error:", err.Error())
+		return
+	}
+	log.Println("englishMnemonic:", englishMnemonic)
+	return
 }
 
 func recoveryMnemonic(entropy string)  {
@@ -102,6 +120,7 @@ func ethPublicToEosPub(ethPubHex string) {
 		log.Println("error in ethPublicToEosPrivate:", err.Error())
 		return
 	}
+	log.Println("length:", len(ethPubByte))
 	eosPub := &ecc.PublicKey{Curve:ecc.CurveK1, Content:ethPubByte}
 	log.Println("eos pub:", eosPub.String())
 }

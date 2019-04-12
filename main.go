@@ -53,7 +53,7 @@ func main()  {
 		toEnglishMnemonic(*mnemonic)
 		break
 	case "toChinese":
-
+		toChineseMnemonic(*mnemonic)
 		break
 	}
 }
@@ -65,6 +65,17 @@ func toEnglishMnemonic(mnemonic string) {
 		return
 	}
 	log.Println("englishMnemonic:", englishMnemonic)
+	return
+}
+
+
+func toChineseMnemonic(mnemonic string) {
+	chineseMnemonic, err := bip39Helper.GetChineseMnemonic(mnemonic)
+	if err != nil {
+		log.Println("GetChineseMnemonic error:", err.Error())
+		return
+	}
+	log.Println("chineseMnemonic:", chineseMnemonic)
 	return
 }
 

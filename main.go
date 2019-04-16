@@ -5,13 +5,14 @@ import (
 	"github.com/eoscanada/eos-go/ecc"
 	"convertAddress/thirdpart/hdwallet"
 	"log"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/eoscanada/eos-go/btcsuite/btcutil"
 	"github.com/eoscanada/eos-go/btcsuite/btcd/btcec"
 	"flag"
 	"github.com/tyler-smith/go-bip39"
 	"mykey/thirdparty/go-ethereum/common/hexutil"
 	"convertAddress/bip39Helpher"
+	"convertAddress/keystoreHelper"
+	"mykey/thirdparty/go-ethereum/crypto"
 )
 
 //2018/11/07 20:32:16 mnemonic: middle market permit snow slight blanket card armed magic hole mammal enter
@@ -55,7 +56,15 @@ func main()  {
 	case "toChinese":
 		toChineseMnemonic(*mnemonic)
 		break
+	case "saveMnemonic":
+		saveMnemonic(*mnemonic)
+		break
 	}
+}
+
+func saveMnemonic(mnemonic string)  {
+	log.Println("mnemonic:", mnemonic)
+	keystoreHelper.CreateMnemonicKeystore(mnemonic, "/Users/zero/Documents/doc", "zerochl0523")
 }
 
 func toEnglishMnemonic(mnemonic string) {

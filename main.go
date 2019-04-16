@@ -26,6 +26,8 @@ func main()  {
 	public := flag.String("public", "", "私钥")
 	entropy := flag.String("entropy", "", "entropy")
 	mnemonic := flag.String("mnemonic", "", "助记词")
+	path := flag.String("path", "", "本机文件路径")
+	password := flag.String("password", "", "密码")
 	flag.Parse()
 	switch *cmd {
 	case "create":
@@ -57,14 +59,14 @@ func main()  {
 		toChineseMnemonic(*mnemonic)
 		break
 	case "saveMnemonic":
-		saveMnemonic(*mnemonic)
+		saveMnemonic(*mnemonic, *path, *password)
 		break
 	}
 }
 
-func saveMnemonic(mnemonic string)  {
+func saveMnemonic(mnemonic, path, password string)  {
 	log.Println("mnemonic:", mnemonic)
-	keystoreHelper.CreateMnemonicKeystore(mnemonic, "/Users/zero/Documents/doc", "zerochl0523")
+	keystoreHelper.CreateMnemonicKeystore(mnemonic, path, password)
 }
 
 func toEnglishMnemonic(mnemonic string) {

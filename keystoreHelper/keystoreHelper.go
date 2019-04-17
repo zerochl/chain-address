@@ -8,6 +8,7 @@ import (
 	"github.com/tyler-smith/go-bip39"
 	"mykey/thirdparty/go-ethereum/accounts/keystore"
 	"mykey/thirdparty/go-ethereum/crypto"
+	"encoding/hex"
 )
 
 func prepareKeystore(keystorePath, password string) (encryptPassword string, ks *keystore.KeyStore, err error) {
@@ -53,6 +54,26 @@ func CreateMnemonicKeystore(mnemonic, keystorePath, password string) {
 	log.Println("keystore json:", keystoreJson)
 }
 
+func DecodeKeystore(keystoreJson, password string)  {
+	key, err := keystore.DecryptKey([]byte(keystoreJson), password)
+	if err != nil {
+		log.Println("in decodeKeystore DecryptKey error:", err.Error())
+		return
+	}
+	privateHex := hex.EncodeToString(key.PrivateKey.D.Bytes())
+	entropy, err := getEntropyByPrivateHex(privateHex)
+	if err != nil {
+		log.Println("in decodeKeystore getEntropyByPrivateHex error:", err.Error())
+		return
+	}
+	mnemonic, err := bip39Helper.NewEnglishMnemonic(entropy)
+	if err != nil {
+		log.Println("in decodeKeystore NewEnglishMnemonic error:", err.Error())
+		return
+	}
+	log.Println("mnemonic:", mnemonic)
+}
+
 func getPrivateByteByEntropy(entropy []byte) ([]byte, error) {
 	newEntropy, err := bip39.NewEntropy(128)
 	if err != nil {
@@ -66,6 +87,22 @@ func getPrivateByteByEntropy(entropy []byte) ([]byte, error) {
 		privateByte[index + 16] = newItem
 	}
 	return privateByte, nil
+}
+
+func getEntropyByPrivateHex(privateHex string) ([]byte, error) {
+	privateByte, err := hex.DecodeString(privateHex)
+	if err != nil {
+		return nil, err
+	}
+	return getEntropyByPrivateByte(privateByte), nil
+}
+
+func getEntropyByPrivateByte(privateByte []byte) []byte {
+	entropy := make([]byte, 16)
+	for j := 0; j < 16; j++ {
+		entropy[j] = privateByte[j]
+	}
+	return entropy
 }
 
 func keystoreHexAccountByPrivateByte(privateByte []byte, ks *keystore.KeyStore, passwordKey, operationKeyEncryptPassword string) (string, error) {

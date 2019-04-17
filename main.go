@@ -13,6 +13,8 @@ import (
 	"convertAddress/bip39Helpher"
 	"convertAddress/keystoreHelper"
 	"mykey/thirdparty/go-ethereum/crypto"
+	"os"
+	"bufio"
 )
 
 //2018/11/07 20:32:16 mnemonic: middle market permit snow slight blanket card armed magic hole mammal enter
@@ -20,6 +22,8 @@ import (
 //2018/11/07 20:32:16 ETHAddress: 0xAcafB03aa4694F59DbE29aAF484eEbaBC529B97F
 //2018/11/07 20:32:16 EosPrivate: 5Jwi16z6aoErWTL6jG7fASDLPaaib2AjT5NM9o4esVEuuCwJ9Eu
 //2018/11/07 20:32:16 EosAddress: EOS6NpLe5YRbx7Wg47gQCFMp6SnnReta7xUrYUanYbWYWX2QZgxSa
+
+// -cmd saveMnemonic -mnemonic="middle market permit snow slight blanket card armed magic hole mammal enter" -path="/Users/zero/Documents/doc" -password="zerochlzerochl"
 func main()  {
 	cmd := flag.String("cmd", "", "create or ethtoeos or eostoeth")
 	private := flag.String("private", "", "私钥")
@@ -61,7 +65,26 @@ func main()  {
 	case "saveMnemonic":
 		saveMnemonic(*mnemonic, *path, *password)
 		break
+	case "recoveryMnemonic":
+		recoveryMnemonicByKeystore(*path, *password)
+		break
 	}
+}
+
+func recoveryMnemonicByKeystore(path, password string)  {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Println("in recoveryMnemonicByKeystore Open error:", err.Error())
+		return
+	}
+	reader := bufio.NewReader(file)
+	buffer := make([]byte, 1024)
+	length, err := reader.Read(buffer)
+	if err != nil {
+		log.Println("in recoveryMnemonicByKeystore Read error:", err.Error())
+		return
+	}
+	keystoreHelper.DecodeKeystore(string(buffer[:length]), password)
 }
 
 func saveMnemonic(mnemonic, path, password string)  {
